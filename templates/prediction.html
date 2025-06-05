@@ -1,0 +1,880 @@
+{% extends "base.html" %}
+
+{% block title %}AI Prediction - CO2 Emissions Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-5" data-aos="fade-down" data-aos-duration="800">
+        <div class="col-12">
+            <div class="card modern-header-card">
+                <div class="card-body text-center">
+                    <div class="header-icon-container" data-aos="zoom-in" data-aos-delay="200">
+                        <i class="fas fa-robot header-icon"></i>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h1 class="display-4 mb-3 text-gradient">
+                        AI Prediction Engine
+                    </h1>
+                    <p class="lead mb-4">
+                        Predict whether a region belongs to Asia or Europe based on environmental data
+                    </p>
+                    <div class="row mt-4">
+                        <div class="col-md-4" data-aos="flip-left" data-aos-delay="300">
+                            <div class="stat-card glass-effect">
+                                <div class="stat-icon-wrapper">
+                                    <i class="fas fa-brain text-primary fa-2x mb-2"></i>
+                                </div>
+                                <h4 class="stat-value">{{ model_name }}</h4>
+                                <p class="stat-label">Best performing algorithm</p>
+                                <div class="stat-progress">
+                                    <div class="progress-fill" style="--progress: 95%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="flip-left" data-aos-delay="400">
+                            <div class="stat-card glass-effect">
+                                <div class="stat-icon-wrapper">
+                                    <i class="fas fa-percentage text-success fa-2x mb-2"></i>
+                                </div>
+                                <h4 class="stat-value">{{ "%.1f"|format(accuracy * 100) }}%</h4>
+                                <p class="stat-label">Model accuracy</p>
+                                <div class="stat-progress">
+                                    <div class="progress-fill" style="--progress: {{ accuracy * 100 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" data-aos="flip-left" data-aos-delay="500">
+                            <div class="stat-card glass-effect">
+                                <div class="stat-icon-wrapper">
+                                    <i class="fas fa-cogs text-warning fa-2x mb-2"></i>
+                                </div>
+                                <h4 class="stat-value">{{ feature_names|length }}</h4>
+                                <p class="stat-label">Key features</p>
+                                <div class="stat-progress">
+                                    <div class="progress-fill" style="--progress: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Input Form -->
+        <div class="col-lg-6" data-aos="slide-right" data-aos-delay="200">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <h4 class="text-gradient"><i class="fas fa-edit me-2"></i>Input Environmental Data</h4>
+                </div>
+                <div class="card-body">
+                    <form id="predictionForm">
+                        {% for feature in feature_names %}
+                        <div class="mb-3" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 + 300 }}">
+                            <label for="{{ feature }}" class="form-label">
+                                <i class="fas fa-{{ 'industry' if 'Industrial' in feature else 'car' if 'Automobile' in feature else 'seedling' if 'Agriculture' in feature else 'home' if 'Domestic' in feature else 'bolt' if 'Energy' in feature else 'dollar-sign' if 'GDP' in feature else 'users' if 'Population' in feature else 'leaf' if 'Renewable' in feature else 'city' if 'Urbanization' in feature else 'cloud' }} me-2"></i>
+                                {{ feature.replace('_', ' ').title() }}
+                            </label>
+                            <div class="input-group">
+                                <input type="number" 
+                                       class="form-control modern-input" 
+                                       id="{{ feature }}" 
+                                       name="{{ feature }}" 
+                                       step="0.01" 
+                                       placeholder="Enter {{ feature.replace('_', ' ').lower() }}"
+                                       required>
+                                <span class="input-group-text glass-effect">
+                                    {% if 'Co2_Emissions' in feature %}
+                                        MT
+                                    {% elif 'Energy_Consumption' in feature %}
+                                        TWh
+                                    {% elif 'GDP' in feature %}
+                                        B$
+                                    {% elif 'Population' in feature %}
+                                        M
+                                    {% elif 'Percentage' in feature %}
+                                        %
+                                    {% else %}
+                                        #
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="form-text">
+                                {% if 'Co2_Emissions' in feature %}
+                                    Enter CO2 emissions in metric tons
+                                {% elif 'Energy_Consumption' in feature %}
+                                    Enter energy consumption in TWh
+                                {% elif 'GDP' in feature %}
+                                    Enter GDP in billion USD
+                                {% elif 'Population' in feature %}
+                                    Enter population in millions
+                                {% elif 'Percentage' in feature %}
+                                    Enter percentage (0-100)
+                                {% else %}
+                                    Enter numerical value
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="d-grid gap-3 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg modern-btn" data-aos="zoom-in" data-aos-delay="700">
+                                <i class="fas fa-magic me-2"></i>Make Prediction
+                                <span class="btn-shimmer"></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-info modern-btn" onclick="loadSampleData()" data-aos="zoom-in" data-aos-delay="800">
+                                <i class="fas fa-flask me-2"></i>Load Sample Data
+                                <span class="btn-shimmer"></span>
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary modern-btn" data-aos="zoom-in" data-aos-delay="900">
+                                <i class="fas fa-redo me-2"></i>Reset Form
+                                <span class="btn-shimmer"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="col-lg-6" data-aos="slide-left" data-aos-delay="200">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <h4 class="text-gradient"><i class="fas fa-chart-pie me-2"></i>Prediction Results</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Loading Spinner -->
+                    <div id="loadingSpinner" style="display: none;" class="loading-container">
+                        <div class="modern-spinner">
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                        </div>
+                        <p class="loading-text">Analyzing data with AI...</p>
+                        <div class="loading-progress">
+                            <div class="progress-line"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Prediction Results -->
+                    <div id="predictionResults" style="display: none;" class="results-container">
+                        <div class="text-center mb-4">
+                            <div id="predictionIcon" class="prediction-icon-container">
+                                <i class="fas fa-globe fa-4x prediction-icon"></i>
+                                <div class="icon-pulse"></div>
+                            </div>
+                            <h3 id="predictionText" class="prediction-result"></h3>
+                            <p id="confidenceText" class="confidence-score"></p>
+                        </div>
+                        
+                        <div class="probability-section mb-4">
+                            <h5 class="probability-title">Probability Distribution</h5>
+                            <div class="progress-modern mb-3">
+                                <div id="asiaProgress" class="progress-bar-modern bg-info" role="progressbar" style="width: 50%;">
+                                    <span class="progress-label">Asia: <span id="asiaPercent">50%</span></span>
+                                </div>
+                            </div>
+                            <div class="progress-modern">
+                                <div id="europeProgress" class="progress-bar-modern bg-warning" role="progressbar" style="width: 50%;">
+                                    <span class="progress-label">Europe: <span id="europePercent">50%</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info modern-alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>How it works:</strong> Our AI model analyzes the environmental and economic indicators 
+                            you provided to determine the most likely continental region.
+                        </div>
+                        
+                        <div class="result-actions">
+                            <button class="btn btn-outline-primary btn-sm modern-btn" onclick="exportResults()">
+                                <i class="fas fa-download me-2"></i>Export Results
+                                <span class="btn-shimmer"></span>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm modern-btn" onclick="shareResults()">
+                                <i class="fas fa-share me-2"></i>Share
+                                <span class="btn-shimmer"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div id="errorMessage" style="display: none;" class="alert alert-danger modern-alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorText"></span>
+                    </div>
+                    
+                    <!-- Initial Message -->
+                    <div id="initialMessage" class="initial-message">
+                        <div class="initial-icon">
+                            <i class="fas fa-arrow-left fa-3x mb-3"></i>
+                            <div class="icon-bounce"></div>
+                        </div>
+                        <h5>Enter data on the left to get started</h5>
+                        <p>Fill in the environmental indicators and click "Make Prediction" to see results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Explanations -->
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-12">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <h4 class="text-gradient"><i class="fas fa-question-circle me-2"></i>Feature Explanations</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6" data-aos="slide-right" data-aos-delay="500">
+                            <h5 class="feature-category">🏭 Emission Indicators:</h5>
+                            <ul class="feature-list">
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="600">
+                                    <strong>CO2 Emissions:</strong> Total carbon dioxide emissions
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="700">
+                                    <strong>Industrial Emissions:</strong> Emissions from manufacturing
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="800">
+                                    <strong>Automobile Emissions:</strong> Transportation-related CO2
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="900">
+                                    <strong>Agriculture Emissions:</strong> Farming and livestock CO2
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="1000">
+                                    <strong>Domestic Emissions:</strong> Household energy usage
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6" data-aos="slide-left" data-aos-delay="500">
+                            <h5 class="feature-category">📊 Economic & Social Indicators:</h5>
+                            <ul class="feature-list">
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="600">
+                                    <strong>Energy Consumption:</strong> Total energy used (TWh)
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="700">
+                                    <strong>GDP:</strong> Gross Domestic Product (billion USD)
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="800">
+                                    <strong>Population:</strong> Total population (millions)
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="900">
+                                    <strong>Renewable Energy:</strong> % of renewable energy usage
+                                </li>
+                                <li class="feature-item" data-aos="fade-up" data-aos-delay="1000">
+                                    <strong>Urbanization:</strong> % of urban population
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mt-5 mb-5" data-aos="fade-up" data-aos-delay="600">
+        <div class="col-12 text-center">
+            <a href="/visualization" class="btn btn-primary btn-lg me-3 modern-btn">
+                <i class="fas fa-chart-bar me-2"></i>View Data Visualizations
+                <span class="btn-shimmer"></span>
+            </a>
+            <a href="/" class="btn btn-outline-light btn-lg modern-btn">
+                <i class="fas fa-home me-2"></i>Back to Home
+                <span class="btn-shimmer"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modern-header-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-icon-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+
+    .header-icon {
+        font-size: 4rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: iconPulse 3s ease-in-out infinite;
+    }
+
+    .icon-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+        animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    @keyframes glowPulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    }
+
+    .stat-card {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-icon-wrapper {
+        margin-bottom: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.95;
+        margin-bottom: 1rem;
+        color: var(--text-light);
+    }
+
+    .stat-progress {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        width: var(--progress);
+        animation: progressFill 2s ease-out 1s both;
+    }
+
+    .modern-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modern-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+
+    .modern-card:hover::after {
+        transform: scaleX(1);
+    }
+
+    .modern-input {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 15px !important;
+    }
+
+    .modern-input:focus {
+        transform: scale(1.02);
+        box-shadow: 0 0 25px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    .modern-btn {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-shimmer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s ease;
+        z-index: 1;
+    }
+
+    .modern-btn:hover .btn-shimmer {
+        left: 100%;
+    }
+
+    .loading-container {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .modern-spinner {
+        position: relative;
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+    }
+
+    .spinner-ring {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 4px solid transparent;
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spinRing 1s linear infinite;
+    }
+
+    .spinner-ring:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 10px;
+        left: 10px;
+        border-top-color: var(--accent-color);
+        animation-duration: 0.8s;
+        animation-direction: reverse;
+    }
+
+    .spinner-ring:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        top: 20px;
+        left: 20px;
+        border-top-color: var(--success-color);
+        animation-duration: 0.6s;
+    }
+
+    @keyframes spinRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        color: var(--text-light);
+    }
+
+    .loading-progress {
+        width: 200px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .progress-line {
+        height: 100%;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        animation: progressMove 2s ease-in-out infinite;
+    }
+
+    @keyframes progressMove {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(300%); }
+    }
+
+    .results-container {
+        padding: 1rem;
+    }
+
+    .prediction-icon-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+
+    .prediction-icon {
+        animation: resultPulse 2s ease-in-out infinite;
+    }
+
+    .icon-pulse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: pulseExpand 2s ease-in-out infinite;
+    }
+
+    @keyframes resultPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    @keyframes pulseExpand {
+        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
+        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+    }
+
+    .prediction-result {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 1rem 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .confidence-score {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .asia-prediction {
+        color: #17a2b8 !important;
+        text-shadow: 0 0 20px rgba(23, 162, 184, 0.5);
+    }
+
+    .europe-prediction {
+        color: #ffc107 !important;
+        text-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+    }
+
+    .probability-section {
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .probability-title {
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .progress-modern {
+        height: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-bar-modern {
+        height: 100%;
+        border-radius: 15px;
+        transition: width 1s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-bar-modern.bg-info {
+        background: var(--gradient-success);
+    }
+
+    .progress-bar-modern.bg-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #ff8a00 100%);
+    }
+
+    .progress-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: white;
+        z-index: 2;
+    }
+
+    .modern-alert {
+        border-radius: 15px;
+        border: none;
+        backdrop-filter: blur(10px);
+        animation: slideInFromLeft 0.6s ease-out;
+    }
+
+    .result-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    .initial-message {
+        text-align: center;
+        color: var(--text-light);
+        padding: 3rem 2rem;
+        position: relative;
+    }
+
+    .initial-icon {
+        position: relative;
+        display: inline-block;
+    }
+
+    .icon-bounce {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: bounceExpand 2s ease-in-out infinite;
+    }
+
+    @keyframes bounceExpand {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
+    }
+
+    .feature-category {
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .feature-item {
+        padding: 0.8rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        opacity: 0.95;
+        color: var(--text-light);
+    }
+
+    .feature-item:hover {
+        opacity: 1;
+        transform: translateX(10px);
+        border-color: var(--primary-color);
+        color: var(--text-primary);
+    }
+
+    .feature-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .prediction-result {
+            font-size: 2rem;
+        }
+
+        .result-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-actions .btn {
+            width: 200px;
+        }
+
+        .stat-card {
+            height: auto;
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Sample data for demonstration
+    const sampleData = {
+        {% for feature in feature_names %}
+        "{{ feature }}": {% if 'Percentage' in feature %}Math.random() * 100{% elif 'GDP' in feature %}Math.random() * 1000{% elif 'Population' in feature %}Math.random() * 100{% elif 'Energy' in feature %}Math.random() * 1000{% else %}Math.random() * 500{% endif %}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    function loadSampleData() {
+        {% for feature in feature_names %}
+        const input = document.getElementById('{{ feature }}');
+        input.value = sampleData['{{ feature }}'].toFixed(2);
+        
+        // Add animation to show data being filled
+        input.style.transform = 'scale(1.05)';
+        input.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.5)';
+        setTimeout(() => {
+            input.style.transform = '';
+            input.style.boxShadow = '';
+        }, 300);
+        {% endfor %}
+        
+        // Show notification
+        showNotification('Sample data loaded successfully!', 'success');
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+            animation: slideInFromRight 0.5s ease-out;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'info'}-circle me-2"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutToRight 0.5s ease-out';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
+
+    function exportResults() {
+        showNotification('Exporting results...', 'info');
+        // Implementation for export functionality
+    }
+
+    function shareResults() {
+        showNotification('Preparing share link...', 'info');
+        // Implementation for share functionality
+    }
+
+    document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Show loading spinner with animation
+        document.getElementById('loadingSpinner').style.display = 'block';
+        document.getElementById('predictionResults').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('initialMessage').style.display = 'none';
+        
+        // Collect form data
+        const formData = {};
+        {% for feature in feature_names %}
+        formData['{{ feature }}'] = parseFloat(document.getElementById('{{ feature }}').value);
+        {% endfor %}
+        
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            // Hide loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
+            
+            if (result.error) {
+                // Show error with animation
+                document.getElementById('errorText').textContent = result.error;
+                document.getElementById('errorMessage').style.display = 'block';
+                showNotification('Prediction failed. Please check your input.', 'danger');
+            } else {
+                // Show results with animations
+                const prediction = result.prediction;
+                const confidence = result.confidence;
+                const probabilities = result.probabilities;
+                
+                // Update prediction display
+                document.getElementById('predictionText').textContent = prediction;
+                document.getElementById('predictionText').className = 
+                    'prediction-result ' + (prediction === 'Asia' ? 'asia-prediction' : 'europe-prediction');
+                
+                document.getElementById('confidenceText').textContent = 
+                    `Confidence: ${confidence.toFixed(1)}%`;
+                
+                // Update icon based on prediction
+                const icon = document.getElementById('predictionIcon').querySelector('i');
+                if (prediction === 'Asia') {
+                    icon.className = 'fas fa-map-marked-alt fa-4x asia-prediction prediction-icon';
+                } else {
+                    icon.className = 'fas fa-map fa-4x europe-prediction prediction-icon';
+                }
+                
+                // Update progress bars with animation
+                setTimeout(() => {
+                    document.getElementById('asiaPercent').textContent = `${probabilities.Asia.toFixed(1)}%`;
+                    document.getElementById('europePercent').textContent = `${probabilities.Europe.toFixed(1)}%`;
+                    document.getElementById('asiaProgress').style.width = `${probabilities.Asia}%`;
+                    document.getElementById('europeProgress').style.width = `${probabilities.Europe}%`;
+                }, 500);
+                
+                document.getElementById('predictionResults').style.display = 'block';
+                showNotification('Prediction completed successfully!', 'success');
+            }
+        } catch (error) {
+            // Hide loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
+            
+            // Show error
+            document.getElementById('errorText').textContent = 'Network error. Please try again.';
+            document.getElementById('errorMessage').style.display = 'block';
+            showNotification('Network error. Please try again.', 'danger');
+        }
+    });
+
+    // Add CSS for animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutToRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %} 

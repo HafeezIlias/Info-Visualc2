@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+
+{% block title %}CO2 Emissions Analysis - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero-section" data-aos="fade-up" data-aos-duration="1200">
+        <h1 class="hero-title">
+            <i class="fas fa-globe-americas me-3"></i>
+            CO2 Emissions Analysis
+        </h1>
+        <p class="hero-subtitle">
+            Explore environmental data and predict regional patterns using advanced machine learning
+        </p>
+        <div class="hero-stats mt-5" data-aos="fade-up" data-aos-delay="300">
+            <div class="row text-center">
+                <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="stat-item glass-effect">
+                        <div class="stat-icon">
+                            <i class="fas fa-database fa-3x mb-3"></i>
+                        </div>
+                        <h4 class="stat-number">6,500+</h4>
+                        <p class="stat-label">Data Points</p>
+                        <div class="stat-progress">
+                            <div class="progress-bar" style="--progress: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="stat-item glass-effect">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        </div>
+                        <h4 class="stat-number">7</h4>
+                        <p class="stat-label">ML Models</p>
+                        <div class="stat-progress">
+                            <div class="progress-bar" style="--progress: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="stat-item glass-effect">
+                        <div class="stat-icon">
+                            <i class="fas fa-map fa-3x mb-3"></i>
+                        </div>
+                        <h4 class="stat-number">2</h4>
+                        <p class="stat-label">Continents</p>
+                        <div class="stat-progress">
+                            <div class="progress-bar" style="--progress: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="stat-item glass-effect">
+                        <div class="stat-icon">
+                            <i class="fas fa-industry fa-3x mb-3"></i>
+                        </div>
+                        <h4 class="stat-number">4</h4>
+                        <p class="stat-label">Emission Sectors</p>
+                        <div class="stat-progress">
+                            <div class="progress-bar" style="--progress: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="row mt-5">
+        <div class="col-lg-6 mb-4" data-aos="slide-right" data-aos-delay="200">
+            <div class="card feature-card h-100 modern-card">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="card-title text-gradient">Data Visualization</h3>
+                    <p class="card-text">
+                        Explore comprehensive visualizations of CO2 emissions data across Asia and Europe. 
+                        Analyze patterns, trends, and relationships between various environmental and economic factors.
+                    </p>
+                    <ul class="feature-list mb-4">
+                        <li class="feature-item" data-aos="fade-left" data-aos-delay="300">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Interactive Charts</span>
+                        </li>
+                        <li class="feature-item" data-aos="fade-left" data-aos-delay="400">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Country Comparisons</span>
+                        </li>
+                        <li class="feature-item" data-aos="fade-left" data-aos-delay="500">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Sector Analysis</span>
+                        </li>
+                        <li class="feature-item" data-aos="fade-left" data-aos-delay="600">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Correlation Heatmaps</span>
+                        </li>
+                    </ul>
+                    <a href="/visualization" class="btn btn-primary btn-lg modern-btn">
+                        <i class="fas fa-chart-area me-2"></i>Explore Data
+                        <span class="btn-shimmer"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4" data-aos="slide-left" data-aos-delay="200">
+            <div class="card feature-card h-100 modern-card">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="card-title text-gradient">AI Prediction</h3>
+                    <p class="card-text">
+                        Use our trained machine learning model to predict whether a country/region belongs to 
+                        Asia or Europe based on environmental and economic indicators.
+                    </p>
+                    <ul class="feature-list mb-4">
+                        <li class="feature-item" data-aos="fade-right" data-aos-delay="300">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>7 ML Algorithms Tested</span>
+                        </li>
+                        <li class="feature-item" data-aos="fade-right" data-aos-delay="400">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Best Model Selected</span>
+                        </li>
+                        <li class="feature-item" data-aos="fade-right" data-aos-delay="500">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Real-time Predictions</span>
+                        </li>
+                        <li class="feature-item" data-aos="fade-right" data-aos-delay="600">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Confidence Scores</span>
+                        </li>
+                    </ul>
+                    <a href="/prediction" class="btn btn-success btn-lg modern-btn">
+                        <i class="fas fa-magic me-2"></i>Make Predictions
+                        <span class="btn-shimmer"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Overview -->
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-12">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <h4 class="text-gradient"><i class="fas fa-info-circle me-2"></i>Dataset Overview</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6" data-aos="slide-right" data-aos-delay="400">
+                            <h5 class="mb-4">🔍 Key Features:</h5>
+                            <ul class="modern-list">
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="500">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <span>CO2 Emissions (Total & by Sector)</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="600">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <span>Energy Consumption</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="700">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <span>GDP & Population</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="800">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <span>Renewable Energy Usage</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="900">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <span>Urbanization Percentage</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6" data-aos="slide-left" data-aos-delay="400">
+                            <h5 class="mb-4">🏭 Emission Sectors:</h5>
+                            <ul class="modern-list">
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="500">
+                                    <i class="fas fa-industry text-danger me-2"></i>
+                                    <span>Industrial</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="600">
+                                    <i class="fas fa-car text-warning me-2"></i>
+                                    <span>Automobile</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="700">
+                                    <i class="fas fa-seedling text-success me-2"></i>
+                                    <span>Agriculture</span>
+                                </li>
+                                <li class="list-item" data-aos="fade-up" data-aos-delay="800">
+                                    <i class="fas fa-home text-info me-2"></i>
+                                    <span>Domestic</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-12">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <h4 class="text-gradient"><i class="fas fa-cogs me-2"></i>Technology Stack</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2 col-sm-4 mb-4" data-aos="zoom-in" data-aos-delay="100">
+                            <div class="tech-item">
+                                <i class="fab fa-python fa-3x text-warning mb-2"></i>
+                                <p>Python</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
+                            <div class="tech-item">
+                                <i class="fas fa-flask fa-3x text-success mb-2"></i>
+                                <p>Flask</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 mb-4" data-aos="zoom-in" data-aos-delay="300">
+                            <div class="tech-item">
+                                <i class="fas fa-chart-bar fa-3x text-info mb-2"></i>
+                                <p>Plotly</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 mb-4" data-aos="zoom-in" data-aos-delay="400">
+                            <div class="tech-item">
+                                <i class="fas fa-robot fa-3x text-primary mb-2"></i>
+                                <p>Scikit-learn</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 mb-4" data-aos="zoom-in" data-aos-delay="500">
+                            <div class="tech-item">
+                                <i class="fab fa-bootstrap fa-3x text-purple mb-2"></i>
+                                <p>Bootstrap</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 mb-4" data-aos="zoom-in" data-aos-delay="600">
+                            <div class="tech-item">
+                                <i class="fas fa-database fa-3x text-secondary mb-2"></i>
+                                <p>Pandas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row mt-5 mb-5" data-aos="fade-up" data-aos-delay="500">
+        <div class="col-12 text-center">
+            <div class="cta-section glass-effect">
+                <h3 class="cta-title text-gradient mb-4">Ready to Explore?</h3>
+                <p class="cta-subtitle mb-4">Dive into the world of environmental data analysis and AI predictions</p>
+                <div class="cta-buttons">
+                    <a href="/visualization" class="btn btn-primary btn-lg me-3 modern-btn" data-aos="slide-right" data-aos-delay="600">
+                        <i class="fas fa-chart-area me-2"></i>Start Exploring
+                        <span class="btn-shimmer"></span>
+                    </a>
+                    <a href="/prediction" class="btn btn-success btn-lg modern-btn" data-aos="slide-left" data-aos-delay="600">
+                        <i class="fas fa-magic me-2"></i>Try AI Prediction
+                        <span class="btn-shimmer"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-purple {
+        color: #7c4dff !important;
+    }
+    
+    .stat-item {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stat-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .stat-item:hover::before {
+        transform: translateX(100%);
+    }
+    
+    .stat-item:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-icon {
+        margin-bottom: 1rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-number {
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin: 0.5rem 0;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-label {
+        opacity: 0.95;
+        margin: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+
+    .stat-progress {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin-top: 1rem;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        width: var(--progress);
+        animation: progressFill 2s ease-out 1s both;
+    }
+
+    @keyframes progressFill {
+        from { width: 0; }
+        to { width: var(--progress); }
+    }
+
+    .modern-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modern-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+
+    .modern-card:hover::after {
+        transform: scaleX(1);
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .feature-item {
+        padding: 0.8rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        opacity: 0.95;
+        color: var(--text-light);
+    }
+
+    .feature-item:hover {
+        opacity: 1;
+        transform: translateX(10px);
+        border-color: var(--primary-color);
+        color: var(--text-primary);
+    }
+
+    .feature-item:last-child {
+        border-bottom: none;
+    }
+
+    .modern-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .list-item {
+        padding: 0.8rem 0;
+        transition: all 0.3s ease;
+        opacity: 0.95;
+        color: var(--text-light);
+    }
+
+    .list-item:hover {
+        opacity: 1;
+        transform: translateX(10px);
+        color: var(--text-primary);
+    }
+
+    .modern-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-shimmer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .modern-btn:hover .btn-shimmer {
+        left: 100%;
+    }
+
+    .tech-item {
+        padding: 1.5rem;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tech-item:hover {
+        transform: translateY(-10px) scale(1.05);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .tech-item i {
+        transition: all 0.3s ease;
+    }
+
+    .tech-item:hover i {
+        transform: rotateY(360deg);
+    }
+
+    .cta-section {
+        padding: 4rem 2rem;
+        border-radius: 25px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 30%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 70%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+        z-index: -1;
+    }
+
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .cta-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        max-width: 600px;
+        margin: 0 auto;
+        color: var(--text-light);
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cta-buttons .btn {
+            width: 250px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .cta-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %} 
