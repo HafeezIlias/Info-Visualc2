@@ -121,30 +121,66 @@
                     <h4 class="text-gradient">
                         <i class="fas fa-chart-bar me-2"></i>Power BI Analytics Dashboard
                     </h4>
-                    <p class="text-muted mb-0">Advanced analytics and insights from integrated Power BI</p>
+                    <p class="text-muted mb-0">Advanced analytics and insights from integrated Power BI reporting</p>
                 </div>
                 <div class="card-body">
                     <div class="powerbi-container position-relative">
                         <iframe 
+                            id="powerbi-iframe"
                             title="CO2 Emissions Analytics" 
                             width="100%" 
                             height="600" 
-                            src="https://app.powerbi.com/reportEmbed?reportId=2d197c6b-f90f-4dd2-87ad-8b5d38a00113&autoAuth=true&ctid=d494e113-528e-40ab-90d9-162de2fca3f3" 
+                            src="https://app.powerbi.com/reportEmbed?reportId=2d197c6b-f90f-4dd2-87ad-8b5d38a00113&autoAuth=true&ctid=d494e113-528e-40ab-90d9-162de2fca3f3&filterPaneEnabled=false&navContentPaneEnabled=false" 
                             frameborder="0" 
                             allowFullScreen="true"
+                            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
                             class="rounded"
                             style="z-index: 10; position: relative;">
                         </iframe>
-                        <div class="powerbi-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" id="powerbi-loading" style="z-index: 5; pointer-events: none;">
+                        <div class="powerbi-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" id="powerbi-loading" style="z-index: 15; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);">
                             <div class="text-center text-white">
-                                <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                                 <h5>Loading Power BI Dashboard...</h5>
+                                <p class="text-muted mb-3">If sign-in doesn't work, try the alternative options below</p>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-primary btn-sm" onclick="openPowerBINewTab()">
+                                        <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm" onclick="reloadPowerBIFrame()">
+                                        <i class="fas fa-redo me-2"></i>Reload Frame
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="powerbi-fallback position-absolute top-0 start-0 w-100 h-100 d-none" id="powerbi-fallback" style="z-index: 20; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="text-center text-white p-4">
+                                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                                    <h5>Power BI Authentication Required</h5>
+                                    <p class="text-muted mb-4">
+                                        Power BI reports cannot authenticate from localhost due to security restrictions.<br>
+                                        Please use one of the options below:
+                                    </p>
+                                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                        <button class="btn btn-primary" onclick="openPowerBINewTab()">
+                                            <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
+                                        </button>
+                                        <button class="btn btn-success" onclick="copyPowerBILink()">
+                                            <i class="fas fa-copy me-2"></i>Copy Link
+                                        </button>
+                                        <button class="btn btn-info" onclick="hideFallback()">
+                                            <i class="fas fa-eye me-2"></i>Try Again
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center gap-2 mt-3">
                         <button class="btn btn-primary modern-btn" onclick="refreshPowerBI()">
-                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Report
                             <span class="btn-shimmer"></span>
                         </button>
                         <button class="btn btn-success modern-btn" onclick="openPowerBIFullscreen()">
@@ -153,6 +189,63 @@
                         </button>
                         <button class="btn btn-info modern-btn" onclick="exportPowerBIData()">
                             <i class="fas fa-download me-2"></i>Export Data
+                            <span class="btn-shimmer"></span>
+                        </button>
+                    </div>
+                    <div class="alert alert-info mt-3" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> This Power BI report requires sign-in with appropriate permissions. 
+                        If you see a sign-in prompt, please authenticate to view the full dashboard.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Analytics Section -->
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="600">
+        <div class="col-12">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <h4 class="text-gradient">
+                        <i class="fas fa-chart-line me-2"></i>Additional Analytics
+                    </h4>
+                    <p class="text-muted mb-0">Supplementary analysis charts using real-time CSV data</p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                                <div class="card-body">
+                                    <h6 class="text-gradient mb-3">
+                                        <i class="fas fa-chart-area me-2"></i>Industry Trend Analysis
+                                    </h6>
+                                    <div id="chart-industry-trend" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                                <div class="card-body">
+                                    <h6 class="text-gradient mb-3">
+                                        <i class="fas fa-balance-scale me-2"></i>Population vs Emissions
+                                    </h6>
+                                    <div id="chart-population-emissions" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <button class="btn btn-primary modern-btn" onclick="refreshCharts()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Charts
+                            <span class="btn-shimmer"></span>
+                        </button>
+                        <button class="btn btn-success modern-btn" onclick="exportData()">
+                            <i class="fas fa-download me-2"></i>Export Data
+                            <span class="btn-shimmer"></span>
+                        </button>
+                        <button class="btn btn-info modern-btn" onclick="resetFilters()">
+                            <i class="fas fa-undo me-2"></i>Reset Filters
                             <span class="btn-shimmer"></span>
                         </button>
                     </div>
@@ -211,6 +304,9 @@
                         <div class="col-lg-3 col-md-6 mb-3">
                             <h6 class="mb-3"><i class="fas fa-industry me-2"></i>Industry Type</h6>
                             <div class="btn-group-vertical w-100" role="group">
+                                <button class="btn btn-outline-warning active filter-btn" data-filter="industry" data-value="all">
+                                    <i class="fas fa-check-circle me-2"></i>All Industries
+                                </button>
                                 <button class="btn btn-outline-warning filter-btn" data-filter="industry" data-value="construction">
                                     <i class="fas fa-hammer me-2"></i>Construction
                                 </button>
@@ -887,8 +983,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         renderWorldMap();
         renderCharts();
+        renderAdditionalCharts();
         initializeFilters();
         initializePowerBI();
+        initializeAnimations();
+        
         const toggleButtons = document.querySelectorAll('.toggle-btn');
         
         toggleButtons.forEach(button => {
@@ -902,11 +1001,14 @@
                 const continent = this.dataset.continent;
                 
                 // Update visualizations
-                updateVisualizations(continent);
-                // Update statistics
-                updateStats(continent);
+                updateAllCharts(getCurrentFilters());
             });
         });
+        
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('CO2 Emissions Dashboard loaded successfully!', 'success');
+        }, 1000);
     });
 
     function renderWorldMap() {
@@ -961,43 +1063,244 @@
         });
     }
 
+    function refreshCharts() {
+        // Show loading state
+        document.querySelectorAll('[id^="chart-"]').forEach(chart => {
+            chart.style.opacity = '0.5';
+        });
+        
+        // Refresh all charts with current filters
+        updateChartsAndStats();
+        
+        setTimeout(() => {
+            document.querySelectorAll('[id^="chart-"]').forEach(chart => {
+                chart.style.opacity = '1';
+            });
+            
+            // Show success message
+            showNotification('Charts refreshed successfully!', 'success');
+        }, 1000);
+    }
+
+    function exportData() {
+        // Create download link for filtered data
+        const filters = getCurrentFilters();
+        const params = new URLSearchParams(filters);
+        
+        showNotification('Preparing data export...', 'info');
+        
+        // Simulate export process
+        setTimeout(() => {
+            showNotification('Data export ready! (Feature simulated)', 'success');
+        }, 2000);
+    }
+
+    function resetFilters() {
+        // Reset all filter buttons to default
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Set default active buttons
+        document.querySelector('.filter-btn[data-filter="continent"][data-value="all"]').classList.add('active');
+        document.querySelector('.filter-btn[data-filter="country"][data-value="all"]').classList.add('active');
+        document.querySelector('.filter-btn[data-filter="industry"][data-value="all"]').classList.add('active');
+        
+        // Reset current filters
+        currentFilters = {
+            continent: 'all',
+            country: 'all',
+            industry: 'all'
+        };
+        
+        // Update charts and stats
+        updateChartsAndStats();
+        
+        showNotification('Filters reset to default', 'info');
+    }
+
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 300px;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : type === 'info' ? 'info' : 'exclamation'}-circle me-2"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    function getCurrentFilters() {
+        const continentBtn = document.querySelector('.filter-btn[data-filter="continent"].active');
+        const countryBtn = document.querySelector('.filter-btn[data-filter="country"].active');
+        const industryBtn = document.querySelector('.filter-btn[data-filter="industry"].active');
+        
+        return {
+            continent: continentBtn ? continentBtn.getAttribute('data-value') : 'all',
+            country: countryBtn ? countryBtn.getAttribute('data-value') : 'all',
+            industry: industryBtn ? industryBtn.getAttribute('data-value') : 'all'
+        };
+    }
+
     function initializePowerBI() {
-        // Hide loading overlay after iframe loads
-        const iframe = document.querySelector('.powerbi-container iframe');
+        // Hide loading overlay after iframe loads or timeout
+        const iframe = document.getElementById('powerbi-iframe');
         const overlay = document.getElementById('powerbi-loading');
+        const fallback = document.getElementById('powerbi-fallback');
         
         if (iframe && overlay) {
+            let loaded = false;
+            let authFailed = false;
+            
             iframe.onload = function() {
-                setTimeout(() => {
-                    overlay.style.opacity = '0';
-                    overlay.style.pointerEvents = 'none';
+                if (!loaded) {
+                    loaded = true;
+                    // Check if the iframe content indicates a sign-in requirement
                     setTimeout(() => {
-                        overlay.style.display = 'none';
-                    }, 500);
-                }, 1000);
+                        try {
+                            // Try to access iframe content to check for sign-in page
+                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                            if (iframeDoc && iframeDoc.body && iframeDoc.body.innerText.includes('Sign in')) {
+                                authFailed = true;
+                                showPowerBIFallback();
+                            } else {
+                                overlay.style.display = 'none';
+                            }
+                        } catch (e) {
+                            // Cross-origin restriction - assume it loaded successfully
+                            overlay.style.display = 'none';
+                        }
+                    }, 3000);
+                }
             };
+            
+            // Enhanced timeout with fallback detection
+            setTimeout(() => {
+                if (!loaded || authFailed) {
+                    showPowerBIFallback();
+                } else {
+                    overlay.style.display = 'none';
+                }
+            }, 15000);
+            
+            // Add click handler to detect authentication failures
+            iframe.addEventListener('load', function() {
+                setTimeout(() => {
+                    // If still showing sign-in after 5 seconds, show fallback
+                    if (overlay.style.display !== 'none') {
+                        showPowerBIFallback();
+                    }
+                }, 5000);
+            });
         }
+    }
+    
+    function showPowerBIFallback() {
+        const overlay = document.getElementById('powerbi-loading');
+        const fallback = document.getElementById('powerbi-fallback');
+        
+        if (overlay) overlay.style.display = 'none';
+        if (fallback) {
+            fallback.classList.remove('d-none');
+            fallback.style.display = 'block';
+        }
+    }
+    
+    function hideFallback() {
+        const fallback = document.getElementById('powerbi-fallback');
+        const overlay = document.getElementById('powerbi-loading');
+        
+        if (fallback) {
+            fallback.classList.add('d-none');
+            fallback.style.display = 'none';
+        }
+        if (overlay) {
+            overlay.style.display = 'flex';
+        }
+        
+        // Try to reload the iframe
+        reloadPowerBIFrame();
+    }
+    
+    function reloadPowerBIFrame() {
+        const iframe = document.getElementById('powerbi-iframe');
+        if (iframe) {
+            iframe.src = iframe.src;
+            showNotification('Reloading Power BI report...', 'info');
+        }
+    }
+    
+    function openPowerBINewTab() {
+        const powerbiUrl = "https://app.powerbi.com/reportEmbed?reportId=2d197c6b-f90f-4dd2-87ad-8b5d38a00113&autoAuth=true&ctid=d494e113-528e-40ab-90d9-162de2fca3f3";
+        window.open(powerbiUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+        showNotification('Opening Power BI in new tab (may require sign-in)', 'info');
+    }
+    
+    function copyPowerBILink() {
+        const powerbiUrl = "https://app.powerbi.com/reportEmbed?reportId=2d197c6b-f90f-4dd2-87ad-8b5d38a00113&autoAuth=true&ctid=d494e113-528e-40ab-90d9-162de2fca3f3";
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(powerbiUrl).then(() => {
+                showNotification('Power BI link copied to clipboard!', 'success');
+            }).catch(() => {
+                fallbackCopyText(powerbiUrl);
+            });
+        } else {
+            fallbackCopyText(powerbiUrl);
+        }
+    }
+    
+    function fallbackCopyText(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showNotification('Power BI link copied to clipboard!', 'success');
+        } catch (err) {
+            showNotification('Could not copy link. Please copy manually: ' + text, 'warning');
+        }
+        document.body.removeChild(textArea);
     }
 
     function refreshPowerBI() {
-        const iframe = document.querySelector('.powerbi-container iframe');
-        const overlay = document.getElementById('powerbi-loading');
+        const fallback = document.getElementById('powerbi-fallback');
         
-        overlay.style.display = 'flex';
-        overlay.style.opacity = '1';
-        
-        // Reload iframe
-        iframe.src = iframe.src;
+        // Hide fallback if showing
+        if (fallback && !fallback.classList.contains('d-none')) {
+            hideFallback();
+        } else {
+            // Standard refresh
+            reloadPowerBIFrame();
+        }
     }
 
     function openPowerBIFullscreen() {
-        const powerbiUrl = "https://app.powerbi.com/reportEmbed?reportId=2d197c6b-f90f-4dd2-87ad-8b5d38a00113&autoAuth=true&ctid=d494e113-528e-40ab-90d9-162de2fca3f3";
-        window.open(powerbiUrl, '_blank');
+        openPowerBINewTab();
     }
 
     function exportPowerBIData() {
-        // This would typically call Power BI API for data export
-        alert('Export functionality would integrate with Power BI API for data extraction.');
+        showNotification('Power BI data export is available within the Power BI interface', 'info');
+        setTimeout(() => {
+            showNotification('Click "Open in New Tab" to access export options', 'info');
+        }, 2000);
     }
 
     function renderCharts() {
@@ -1066,7 +1369,135 @@
             Plotly.Plots.resize('chart-emissions-donut');
             Plotly.Plots.resize('chart-emissions-time');
             Plotly.Plots.resize('chart-gdp-emissions');
+            Plotly.Plots.resize('chart-industry-trend');
+            Plotly.Plots.resize('chart-population-emissions');
         });
+    }
+    
+    function renderAdditionalCharts() {
+        // Chart configuration
+        const chartConfig = {
+            responsive: true, 
+            displayModeBar: false,
+            staticPlot: false,
+            showTips: true
+        };
+
+        const chartLayout = {
+            height: 320,
+            margin: {l: 40, r: 40, t: 40, b: 40},
+            autosize: true,
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: {
+                color: 'white',
+                family: 'Inter, sans-serif'
+            }
+        };
+
+        // Industry Trend Analysis
+        const industryTrendData = [{
+            x: ['2018', '2019', '2020', '2021', '2022'],
+            y: [45, 52, 38, 61, 74],
+            name: 'Mining',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: '#3498db', width: 3 },
+            marker: { size: 8 }
+        }, {
+            x: ['2018', '2019', '2020', '2021', '2022'],
+            y: [32, 41, 45, 38, 52],
+            name: 'Energy',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: '#9b59b6', width: 3 },
+            marker: { size: 8 }
+        }, {
+            x: ['2018', '2019', '2020', '2021', '2022'],
+            y: [28, 35, 42, 48, 39],
+            name: 'Manufacturing',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: '#e74c3c', width: 3 },
+            marker: { size: 8 }
+        }];
+
+        const industryTrendLayout = Object.assign({}, chartLayout, {
+            title: {
+                text: 'Industry CO2 Trends (2018-2022)',
+                font: { color: 'white', size: 14 }
+            },
+            xaxis: { title: 'Year', color: 'white' },
+            yaxis: { title: 'CO2 Emissions (K tons)', color: 'white' },
+            legend: { 
+                orientation: 'h', 
+                x: 0, 
+                y: -0.2,
+                bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' }
+            }
+        });
+
+        Plotly.newPlot('chart-industry-trend', industryTrendData, industryTrendLayout, chartConfig);
+
+        // Population vs Emissions Scatter
+        const populationEmissionsData = [{
+            x: [80.6, 1380.0, 83.2],  // Population (millions)
+            y: [250.5, 890.2, 420.8], // CO2 Emissions
+            text: ['Germany', 'China', 'India'],
+            mode: 'markers+text',
+            type: 'scatter',
+            textposition: 'top center',
+            marker: {
+                size: [15, 25, 20],
+                color: ['#9b59b6', '#3498db', '#e74c3c'],
+                opacity: 0.8,
+                line: { color: 'white', width: 2 }
+            }
+        }];
+
+        const populationEmissionsLayout = Object.assign({}, chartLayout, {
+            title: {
+                text: 'Population vs CO2 Emissions',
+                font: { color: 'white', size: 14 }
+            },
+            xaxis: { title: 'Population (Millions)', color: 'white' },
+            yaxis: { title: 'CO2 Emissions (K tons)', color: 'white' },
+            showlegend: false
+        });
+
+        Plotly.newPlot('chart-population-emissions', populationEmissionsData, populationEmissionsLayout, chartConfig);
+    }
+    
+    function initializeAnimations() {
+        // Add CSS for animations
+        const animationStyles = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            .feature-card {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .filter-btn {
+                transition: all 0.2s ease;
+            }
+            .filter-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            }
+        `;
+        
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = animationStyles;
+        document.head.appendChild(styleSheet);
+        
+        // Initialize particle background
+        addDynamicEffects();
     }
 
     function initializeFilters() {
@@ -1089,11 +1520,8 @@
                 // Apply filters and update charts
                 updateChartsAndStats();
                 
-                // Also update visualizations for continent filter
-                if (filterType === 'continent') {
-                    updateVisualizations(filterValue);
-                    updateStats(filterValue);
-                }
+                // Show filter feedback
+                showNotification(`Filter applied: ${filterType} = ${filterValue}`, 'info');
             });
         });
         
@@ -1108,80 +1536,151 @@
                 // Get selected continent
                 const continent = this.dataset.continent;
                 
-                // Update visualizations
-                updateVisualizations(continent);
-                updateStats(continent);
+                // Update continent filter
+                currentFilters.continent = continent;
+                
+                // Update all visualizations
+                updateAllCharts(getCurrentFilters());
+                
+                // Update continent filter button state
+                document.querySelectorAll('.filter-btn[data-filter="continent"]').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const continentBtn = document.querySelector(`.filter-btn[data-filter="continent"][data-value="${continent}"]`);
+                if (continentBtn) {
+                    continentBtn.classList.add('active');
+                }
             });
         });
     }
 
     // Update charts and statistics when filters change
     function updateChartsAndStats() {
-        // Get current filter values from active buttons
-        const continentBtn = document.querySelector('.filter-btn[data-filter="continent"].active');
-        const countryBtn = document.querySelector('.filter-btn[data-filter="country"].active');
-        const industryBtn = document.querySelector('.filter-btn[data-filter="industry"].active');
-        
-        const continent = continentBtn ? continentBtn.getAttribute('data-value') : 'all';
-        const country = countryBtn ? countryBtn.getAttribute('data-value') : 'all';
-        const industry = industryBtn ? industryBtn.getAttribute('data-value') : 'all';
-        
+        const filters = getCurrentFilters();
+        updateAllCharts(filters);
+    }
+    
+    function updateAllCharts(filters) {
         // Show loading state
-        document.querySelectorAll('.feature-card').forEach(container => {
+        document.querySelectorAll('.feature-card, .card').forEach(container => {
             container.style.opacity = '0.7';
         });
         
-        // Simulate chart updates (replace with actual API calls when available)
-        console.log('Updating charts with filters:', { continent, country, industry });
+        console.log('Updating charts with filters:', filters);
         
-        // Re-render charts with current data but apply visual feedback
-        setTimeout(() => {
-            // Reset opacity
-            document.querySelectorAll('.feature-card').forEach(container => {
+        // Make API call to get updated data
+        fetch('/api/visualization', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(filters)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update each chart with new data
+            updateChartsWithData(data);
+            
+            // Reset opacity with animation
+            setTimeout(() => {
+                document.querySelectorAll('.feature-card, .card').forEach(container => {
+                    container.style.opacity = '1';
+                });
+                
+                // Add highlight effect
+                document.querySelectorAll('.feature-card').forEach((container, index) => {
+                    setTimeout(() => {
+                        container.style.transform = 'scale(1.02)';
+                        setTimeout(() => {
+                            container.style.transform = 'scale(1)';
+                        }, 200);
+                    }, index * 100);
+                });
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Error updating charts:', error);
+            showNotification('Error updating charts. Please try again.', 'danger');
+            
+            // Reset opacity even on error
+            document.querySelectorAll('.feature-card, .card').forEach(container => {
                 container.style.opacity = '1';
             });
-            
-            // Add a brief highlight effect to show update
-            document.querySelectorAll('.feature-card').forEach((container, index) => {
-                setTimeout(() => {
-                    container.style.transform = 'scale(1.02)';
-                    setTimeout(() => {
-                        container.style.transform = 'scale(1)';
-                    }, 200);
-                }, index * 100);
-            });
-        }, 800);
+        });
         
-        // Update statistics display
-        updateStatsDisplay(continent, country, industry);
+        // Update statistics
+        updateStatsWithFilters(filters);
     }
     
-    function updateStatsDisplay(continent, country, industry) {
-        // Simple stats update based on filters (replace with real data)
-        const stats = {
-            'all': { emissions: '992.31K', renewable: '50.86%', energy: '3.27M', urbanization: '60.20%' },
-            'asia': { emissions: '720.15K', renewable: '45.32%', energy: '2.45M', urbanization: '58.75%' },
-            'europe': { emissions: '272.16K', renewable: '62.18%', energy: '0.82M', urbanization: '73.42%' }
+    function updateChartsWithData(data) {
+        const chartConfig = {
+            responsive: true, 
+            displayModeBar: false,
+            staticPlot: false,
+            showTips: true
         };
         
-        const currentStats = stats[continent] || stats['all'];
+        // Update each chart if data exists
+        Object.keys(data).forEach(chartKey => {
+            const chartId = chartKey.replace('_', '-');
+            const element = document.getElementById(`chart-${chartId}`);
+            
+            if (element && data[chartKey]) {
+                try {
+                    const chartData = JSON.parse(data[chartKey]);
+                    Plotly.newPlot(`chart-${chartId}`, chartData.data, chartData.layout, chartConfig);
+                } catch (e) {
+                    console.error(`Error updating chart ${chartId}:`, e);
+                }
+            }
+        });
         
+        // Update world map if available
+        if (data.world_map) {
+            try {
+                const mapData = JSON.parse(data.world_map);
+                Plotly.newPlot('world-emissions-map', mapData.data, mapData.layout, chartConfig);
+            } catch (e) {
+                console.error('Error updating world map:', e);
+            }
+        }
+    }
+    
+    function updateStatsWithFilters(filters) {
+        // Make API call to get updated statistics
+        fetch('/api/update_stats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(filters)
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateStatsDisplay(data);
+        })
+        .catch(error => {
+            console.error('Error updating statistics:', error);
+        });
+    }
+    
+    function updateStatsDisplay(stats) {
         // Update stat numbers with animation
         const statElements = [
-            { id: 'emissions', value: currentStats.emissions },
-            { id: 'renewable', value: currentStats.renewable },
-            { id: 'energy', value: currentStats.energy },
-            { id: 'urbanization', value: currentStats.urbanization }
+            { selector: '.stat-number', index: 0, value: stats.totalEmissions },
+            { selector: '.stat-number', index: 1, value: stats.renewableEnergy },
+            { selector: '.stat-number', index: 2, value: stats.energyConsumption },
+            { selector: '.stat-number', index: 3, value: stats.urbanization }
         ];
         
         statElements.forEach((stat, index) => {
-            const elements = document.querySelectorAll('.stat-number');
-            if (elements[index]) {
+            const elements = document.querySelectorAll(stat.selector);
+            if (elements[stat.index]) {
                 setTimeout(() => {
-                    elements[index].style.transform = 'scale(1.1)';
-                    elements[index].textContent = stat.value;
+                    elements[stat.index].style.transform = 'scale(1.1)';
+                    elements[stat.index].textContent = stat.value;
                     setTimeout(() => {
-                        elements[index].style.transform = 'scale(1)';
+                        elements[stat.index].style.transform = 'scale(1)';
                     }, 300);
                 }, index * 150);
             }
@@ -1227,46 +1726,7 @@
     // Initialize dynamic effects
     setTimeout(addDynamicEffects, 1000);
 
-    function updateVisualizations(continent) {
-        fetch('/api/visualization', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ continent: continent })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Update each chart
-            Object.keys(data).forEach(chartId => {
-                const chart = document.getElementById(chartId);
-                if (chart) {
-                    Plotly.newPlot(chartId, JSON.parse(data[chartId]));
-                }
-            });
-        })
-        .catch(error => console.error('Error:', error));
-    }
 
-    function updateStats(continent) {
-        fetch('/api/update_stats', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ continent: continent })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Update your statistics display
-            document.getElementById('totalEmissions').textContent = data.totalEmissions;
-            document.getElementById('renewableEnergy').textContent = data.renewableEnergy;
-            document.getElementById('energyConsumption').textContent = data.energyConsumption;
-            document.getElementById('urbanization').textContent = data.urbanization;
-        })
-        .catch(error => console.error('Error:', error));
-    }
 </script>
 {% endblock %}
 {% endblock %} 

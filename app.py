@@ -72,14 +72,23 @@ def visualization():
 def get_visualization():
     data = request.json
     continent = data.get('continent', 'all')
+    country = data.get('country', 'all')
+    industry = data.get('industry', 'all')
     
     # Load and filter data
     df = load_data()
     
-    # Apply continent filter
+    # Apply filters
     filtered_df = df.copy()
+    
     if continent != 'all':
         filtered_df = filtered_df[filtered_df['Continent'].str.lower() == continent.lower()]
+    
+    if country != 'all':
+        filtered_df = filtered_df[filtered_df['Country'].str.lower() == country.lower()]
+        
+    if industry != 'all':
+        filtered_df = filtered_df[filtered_df['Industry_Type'].str.lower() == industry.lower()]
     
     charts = create_visualizations(filtered_df)
     return jsonify(charts)
@@ -88,35 +97,42 @@ def get_visualization():
 def update_stats():
     data = request.json
     continent = data.get('continent', 'all')
+    country = data.get('country', 'all')
+    industry = data.get('industry', 'all')
     
     # Load and filter data
     df = load_data()
     
-    # Apply continent filter
+    # Apply filters
     filtered_df = df.copy()
+    
     if continent != 'all':
         filtered_df = filtered_df[filtered_df['Continent'].str.lower() == continent.lower()]
     
+    if country != 'all':
+        filtered_df = filtered_df[filtered_df['Country'].str.lower() == country.lower()]
+        
+    if industry != 'all':
+        filtered_df = filtered_df[filtered_df['Industry_Type'].str.lower() == industry.lower()]
+    
     # Calculate statistics from filtered data
-    total_emissions = filtered_df['Co2_Emissions_MetricTons'].sum() / 1000  # Convert to K
-    
-    # Calculate renewable energy percentage
-    if 'Renewable_Energy_Percentage' in filtered_df.columns and len(filtered_df) > 0:
+    if len(filtered_df) > 0:
+        total_emissions = filtered_df['Co2_Emissions_MetricTons'].sum() / 1000  # Convert to K
+        
+        # Calculate renewable energy percentage
         renewable_energy = filtered_df['Renewable_Energy_Percentage'].mean()
-    else:
-        renewable_energy = 50.86
-    
-    # Calculate energy consumption
-    if 'Energy_Consumption_TWh' in filtered_df.columns and len(filtered_df) > 0:
+        
+        # Calculate energy consumption
         energy_consumption = filtered_df['Energy_Consumption_TWh'].sum() / 1000  # Convert to M
-    else:
-        energy_consumption = 3.27
-    
-    # Calculate urbanization percentage
-    if 'Urbanization_Percentage' in filtered_df.columns and len(filtered_df) > 0:
+        
+        # Calculate urbanization percentage
         urbanization = filtered_df['Urbanization_Percentage'].mean()
     else:
-        urbanization = 60.20
+        # Default values if no data matches filters
+        total_emissions = 0
+        renewable_energy = 0
+        energy_consumption = 0
+        urbanization = 0
     
     return jsonify({
         'totalEmissions': f"{total_emissions:.2f}K",
@@ -532,6 +548,95 @@ def create_visualizations(df):
             height=350
         )
         charts['gdp_emissions'] = json.dumps(gdp_emissions, cls=plotly.utils.PlotlyJSONEncoder)
+
+        # 8. Industry Trend Analysis using ACTUAL data
+        industry_trend = go.Figure()
+        
+        if 'Year' in df.columns:
+            # Get industry data by year
+            industries = df['Industry_Type'].unique()
+            for industry in industries[:4]:  # Limit to 4 industries for readability
+                industry_data = df[df['Industry_Type'] == industry]
+                yearly_data = industry_data.groupby('Year')['Co2_Emissions_MetricTons'].mean().reset_index()
+                
+                if len(yearly_data) > 0:
+                    industry_trend.add_trace(go.Scatter(
+                        x=yearly_data['Year'],
+                        y=yearly_data['Co2_Emissions_MetricTons'],
+                        mode='lines+markers',
+                        name=industry,
+                        line=dict(width=3),
+                        marker=dict(size=8)
+                    ))
+        
+        industry_trend.update_layout(
+            title={
+                'text': 'Industry CO2 Trends Over Time',
+                'font': {'size': 14, 'color': 'white'},
+                'x': 0.02,
+                'y': 0.95
+            },
+            template='plotly_dark',
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white', size=10),
+            xaxis_title="Year",
+            yaxis_title="Average CO2 Emissions (Metric Tons)",
+            legend=dict(
+                orientation="h",
+                x=0.02,
+                y=0.02,
+                bgcolor='rgba(0,0,0,0)'
+            ),
+            margin=dict(l=40, r=40, t=80, b=60),
+            height=350
+        )
+        charts['industry_trend'] = json.dumps(industry_trend, cls=plotly.utils.PlotlyJSONEncoder)
+
+        # 9. Population vs Emissions using ACTUAL data
+        population_emissions = go.Figure()
+        
+        if 'Population_Millions' in df.columns:
+            # Get country averages
+            country_data = df.groupby('Country').agg({
+                'Population_Millions': 'mean',
+                'Co2_Emissions_MetricTons': 'mean',
+                'Continent': 'first'
+            }).reset_index()
+            
+            population_emissions.add_trace(go.Scatter(
+                x=country_data['Population_Millions'],
+                y=country_data['Co2_Emissions_MetricTons'],
+                mode='markers+text',
+                text=country_data['Country'].str.title(),
+                textposition='top center',
+                marker=dict(
+                    size=[15 if x < 100 else 25 if x < 500 else 35 for x in country_data['Population_Millions']],
+                    color=[colors.get(continent.lower(), '#3498db') for continent in country_data['Continent']],
+                    opacity=0.8,
+                    line=dict(width=2, color='white')
+                ),
+                hovertemplate='<b>%{text}</b><br>Population: %{x:.1f}M<br>CO2: %{y:.2f} tons<extra></extra>'
+            ))
+        
+        population_emissions.update_layout(
+            title={
+                'text': 'Population vs CO2 Emissions by Country',
+                'font': {'size': 14, 'color': 'white'},
+                'x': 0.02,
+                'y': 0.95
+            },
+            template='plotly_dark',
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white', size=10),
+            xaxis_title="Population (Millions)",
+            yaxis_title="Average CO2 Emissions (Metric Tons)",
+            showlegend=False,
+            margin=dict(l=40, r=40, t=80, b=60),
+            height=350
+        )
+        charts['population_emissions'] = json.dumps(population_emissions, cls=plotly.utils.PlotlyJSONEncoder)
 
     except Exception as e:
         print(f"Error creating visualizations: {e}")
