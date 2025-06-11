@@ -194,6 +194,38 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+@app.route('/templates/<path:filename>')
+def block_template_access(filename):
+    """Block direct access to template files for security."""
+    return "Direct access to template files is not allowed.", 403
+
+@app.errorhandler(404)
+def not_found_error(error):
+    """Custom 404 page with proper DOCTYPE."""
+    return '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - CO2 Emissions Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; display: flex; align-items: center; }
+        .error-container { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-container">
+            <h1 class="display-1">404</h1>
+            <h2>Page Not Found</h2>
+            <p class="lead">The page you're looking for doesn't exist.</p>
+            <a href="/" class="btn btn-light btn-lg">Go Home</a>
+        </div>
+    </div>
+</body>
+</html>''', 404
+
 def create_visualizations(df):
     """Create various data visualizations matching the provided design."""
     charts = {}

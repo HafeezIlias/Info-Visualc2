@@ -1,0 +1,37 @@
+# Prevent direct access to template files
+<Files "*.html">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Redirect template directory access to main app
+RedirectMatch 301 ^/templates/(.*)$ /
+
+# Force HTML5 DOCTYPE for any HTML files
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block direct template access
+    RewriteRule ^templates/ - [F,L]
+    
+    # Ensure all requests go through Flask
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ / [L,R=301]
+</IfModule>
+
+# Set proper headers for HTML files
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|htm)$">
+        Header set X-UA-Compatible "IE=edge"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule> 
